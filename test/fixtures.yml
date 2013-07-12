@@ -620,3 +620,8 @@ wirecard:
 world_pay_gateway:
   login: LOGIN
   password: PASSWORD
+
+moip:
+  email: activemerchant@gmail.com
+  access_token: 3BTLZDXCU2FXPPQV9QAY7FAZQMUISIYD
+  secret: DRG0UHVE4N2TER26LBNGUBVZSDNOUZN9YFMPKTNQ
