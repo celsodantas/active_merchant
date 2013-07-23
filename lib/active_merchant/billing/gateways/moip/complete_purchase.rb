@@ -68,6 +68,10 @@ module  ActiveMerchant #:nodoc:
           @response["Mensagem"]
         end
 
+        def moip_code
+          @response["CodigoMoIP"]
+        end
+
       end
     end
   end

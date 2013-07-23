@@ -18,7 +18,7 @@ module  ActiveMerchant #:nodoc:
       self.homepage_url = 'http://www.moip.com.br/'
 
       # The name of the gateway
-      self.display_name = 'MOIP'
+      self.display_name = 'Moip'
 
       def initialize(options = {})
         requires!(options, :email, :access_token, :secret)
@@ -30,30 +30,14 @@ module  ActiveMerchant #:nodoc:
         super
       end
 
-      # Didn't find any info about authorization
-      # def authorize(money, creditcard, options = {})
-      #   post = {}
-      #   add_invoice(post, options)
-      #   add_creditcard(post, creditcard)
-      #   add_address(post, creditcard, options)
-      #   add_customer_data(post, options)
-
-      #   commit('authonly', money, post)
-      # end
-
       def purchase(money, creditcard, options = {})
         options.update({merchant_email: @merchant_email})
 
         authorization = MoipCore::AuthorizationRequest.new(self, money, options).request
         complete = MoipCore::CompletePurchase.new(self, creditcard, authorization.token).request
 
-        Response.new(complete.success?, complete.message, complete.response, :test => test?, :authorization => authorization.token)
+        Response.new(complete.success?, complete.message, complete.response, :test => test?, :authorization => complete.moip_code)
       end
-
-      # there's no capture event
-      # def capture(money, authorization, options = {})
-      #   get_token('capture', money, post)
-      # end
 
       def url
         test? ? test_url : live_url

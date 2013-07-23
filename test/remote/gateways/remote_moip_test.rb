@@ -9,7 +9,7 @@ class RemoteMoipTest < Test::Unit::TestCase
   def setup
     @gateway = MoipGateway.new(fixtures(:moip))
 
-    @amount =   500
+    @amount = 1000
     @credit_card = credit_card('4000100011112224')
     @declined_card = credit_card('4000300011112220')
 
@@ -28,41 +28,25 @@ class RemoteMoipTest < Test::Unit::TestCase
       :billing_address => brazilian_address,
       :description => 'Store Purchase',
       :reason => "because it's cool.",
-
     }
-    
-    # address = address.merge({:number => 55, :neighborhood => "downtown"})
   end
 
   def test_successful_purchase
-    # @creditcard = {
-    #   owner: {
-    #     dob: "30/12/1987",
-    #     phone: "(11)3165-4020",
-    #     brazilian_id: "222.222.222-22"
-    #   }
-    # }
-
-    # defaults = {
-    #   :number => number,
-    #   :month => 9,
-    #   :year => Time.now.year + 1,
-    #   :first_name => 'Longbob',
-    #   :last_name => 'Longsen',
-    #   :verification_value => '123',
-    #   :brand => 'visa'
-    # }.update(options)
-
     assert response = @gateway.purchase(@amount, @credit_card, @options)
     assert_success response
     assert_equal 'Requisição processada com sucesso', response.message
   end
 
-  # def test_unsuccessful_purchase
-  #   assert response = @gateway.purchase(@amount, @declined_card, @options)
-  #   assert_failure response
-  #   assert_equal 'REPLACE WITH FAILED PURCHASE MESSAGE', response.message
-  # end
+  def test_unsuccessful_purchase
+    # TODO find a way that the moip sandbox denies the credit card or any other information
+    @declined_card.number = ""
+    @declined_card.verification_value
+
+    assert response = @gateway.purchase(@amount, @declined_card, @options)
+    debugger
+    assert_failure response
+    assert_equal 'REPLACE WITH FAILED PURCHASE MESSAGE', response.message
+  end
 
   # def test_authorize_and_capture
   #   amount = @amount
