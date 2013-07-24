@@ -38,39 +38,22 @@ class RemoteMoipTest < Test::Unit::TestCase
   end
 
   def test_unsuccessful_purchase
-    # TODO find a way that the moip sandbox denies the credit card or any other information
-    @declined_card.number = ""
-    @declined_card.verification_value
+    @options[:billing_address][:state] = nil
 
     assert response = @gateway.purchase(@amount, @declined_card, @options)
-    debugger
     assert_failure response
-    assert_equal 'REPLACE WITH FAILED PURCHASE MESSAGE', response.message
+    assert_equal 'Estado de endereço deverá ser enviado obrigatoriamente', response.message
   end
 
-  # def test_authorize_and_capture
-  #   amount = @amount
-  #   assert auth = @gateway.authorize(amount, @credit_card, @options)
-  #   assert_success auth
-  #   assert_equal 'Success', auth.message
-  #   assert auth.authorization
-  #   assert capture = @gateway.capture(amount, auth.authorization)
-  #   assert_success capture
-  # end
+  def test_invalid_login
+    gateway = MoipGateway.new(
+                :access_token => 'nnn',
+                :secret => 'nnn',
+                :email => 'nnn'
+              )
 
-  # def test_failed_capture
-  #   assert response = @gateway.capture(@amount, '')
-  #   assert_failure response
-  #   assert_equal 'REPLACE WITH GATEWAY FAILURE MESSAGE', response.message
-  # end
-
-  # def test_invalid_login
-  #   gateway = MoipGateway.new(
-  #               :login => '',
-  #               :password => ''
-  #             )
-  #   assert response = gateway.purchase(@amount, @credit_card, @options)
-  #   assert_failure response
-  #   assert_equal 'REPLACE WITH FAILURE MESSAGE', response.message
-  # end
+    assert_raise ActiveMerchant::ResponseError do
+      gateway.purchase(@amount, @credit_card, @options)
+    end
+  end
 end

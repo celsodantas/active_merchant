@@ -1,3 +1,4 @@
+#encoding: utf-8
 require 'test_helper'
 require 'debugger'
 
@@ -52,6 +53,15 @@ class MoipTest < Test::Unit::TestCase
     assert response.test?
   end
 
+  def test_repetitive_use_of_id
+    @gateway.expects(:ssl_post).returns(failed_authorization_response)
+
+    assert response = @gateway.purchase(@amount, @credit_card, @options)    
+    assert_failure response
+    assert response.test?
+    assert_equal "Id Próprio já foi utilizado em outra Instrução", response.message
+  end
+
   private
 
   # Place raw successful response from gateway here
@@ -60,7 +70,27 @@ class MoipTest < Test::Unit::TestCase
   end
 
   def successful_authorization_response
-    "<ns1:EnviarInstrucaoUnicaResponse xmlns:ns1=\"http://www.moip.com.br/ws/alpha/\"><Resposta><ID>201307222238491280000004056938</ID><Status>Sucesso</Status><Token>F2M0R173P0W7J2N2W2X2W3K8S4Y9R1A2D8B010D0G0C0I0R4X0X5F6K9G328</Token></Resposta></ns1:EnviarInstrucaoUnicaResponse>"
+    <<-RESP
+    <ns1:EnviarInstrucaoUnicaResponse xmlns:ns1="http://www.moip.com.br/ws/alpha/">
+      <Resposta>
+        <ID>201307222238491280000004056938</ID>
+        <Status>Sucesso</Status>
+        <Token>F2M0R173P0W7J2N2W2X2W3K8S4Y9R1A2D8B010D0G0C0I0R4X0X5F6K9G328</Token>
+      </Resposta>
+    </ns1:EnviarInstrucaoUnicaResponse>
+    RESP
+  end
+
+  def failed_authorization_response
+    <<-RESP
+    <ns1:EnviarInstrucaoUnicaResponse xmlns:ns1="https://www.moip.com.br/ws/alpha/">
+        <Resposta>
+            <ID>200807231712344030000000000014</ID>
+            <Status>Falha</Status>
+            <Erro Codigo="102">Id Próprio já foi utilizado em outra Instrução</Erro>
+        </Resposta>
+    </ns1:EnviarInstrucaoUnicaResponse>
+    RESP
   end
 
   # Place raw failed response from gateway here

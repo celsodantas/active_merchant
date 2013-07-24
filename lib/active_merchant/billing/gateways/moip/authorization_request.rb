@@ -3,6 +3,8 @@ module  ActiveMerchant #:nodoc:
     module MoipCore #:nodoc
 
       class AuthorizationRequest
+        attr_reader :response
+        
         def initialize(gateway, money, options)
           @gateway = gateway
           @money   = money
@@ -22,6 +24,10 @@ module  ActiveMerchant #:nodoc:
 
         def success?
           @response["EnviarInstrucaoUnicaResponse"]["Resposta"]["Status"] == "Sucesso"
+        end
+
+        def error_message
+          @response["EnviarInstrucaoUnicaResponse"]["Resposta"]["Erro"]
         end
 
         def id

@@ -34,9 +34,15 @@ module  ActiveMerchant #:nodoc:
         options.update({merchant_email: @merchant_email})
 
         authorization = MoipCore::AuthorizationRequest.new(self, money, options).request
+        return failed_response(authorization) unless authorization.success?
+
         complete = MoipCore::CompletePurchase.new(self, creditcard, authorization.token).request
 
         Response.new(complete.success?, complete.message, complete.response, :test => test?, :authorization => complete.moip_code)
+      end
+
+      def failed_response(authorization)
+        Response.new(authorization.success?, authorization.error_message, authorization.response, :test => test?)
       end
 
       def url
